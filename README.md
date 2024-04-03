@@ -20,14 +20,13 @@ To run this project, you'll need the following installed on your system:
 To get the program running on your local environment, follow these steps:
 
 1. **Clone the repository** to your local machine.
-2. **Download ChromeDriver** and place it in the project directory. Ensure it is compatible with your version of Chrome.
-3. **Install the required dependencies** using pip:
+2. **Install the required dependencies** using pip:
 
    ```bash
    pip install Flask requests beautifulsoup4 selenium webdriver-manager
 
 
-4. **Run the Flask application** by executing the `app.py` file:
+3. **Run the Flask application** by executing the `app.py` file:
 
    ```bash
    python app.py

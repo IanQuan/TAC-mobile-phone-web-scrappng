@@ -1,4 +1,4 @@
-# TAC/IMEI Mobeil Phone Web-Scraping 
+# TAC/IMEI Mobile Device Web-Scraping 
 
 This project is designed to scrape product listings from various e-commerce websites based on a TAC or IMEI code provided by the user. It leverages Python with Flask for the backend, along with Selenium and BeautifulSoup for web scraping functionalities.
 

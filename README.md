@@ -23,8 +23,7 @@ To get the program running on your local environment, follow these steps:
 2. **Install the required dependencies** using pip:
 
    ```bash
-   pip install Flask requests beautifulsoup4 selenium webdriver-manager
-
+   pip install -r requirements.txt
 
 3. **Run the Flask application** by executing the `app.py` file:
 

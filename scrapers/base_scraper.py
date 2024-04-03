@@ -10,7 +10,7 @@ class BaseScraper:
                                   'replacement', 'wallet', 'holder', 'headphone',
                                   'headphones', 'earbud', 'earbuds', 'laptop', 'glass', 'frame', 
                                   'cable', 'charge', 'airpods', 'Compatible', 'stand', 
-                                  'protector', 'replacements']
+                                  'protector', 'replacements', 'protective', 'cover']
 
     def get_phone(self, brand, model_name):
         raise NotImplementedError("Subclasses must implement this method")

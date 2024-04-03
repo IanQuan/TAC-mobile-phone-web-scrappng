@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Product Listings</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div id="search bar">
+      <select id="filter-source">
+        <option value="All">All</option>
+        <option value="Amazon">Amazon</option>
+        <option value="BestBuy">BestBuy</option>
+        <option value="Ebay">Ebay</option>
+      </select>
+
+      <label for="sort-select">Sort by:</label>
+      <select id="sort-select">
+        <option value="price">Price</option>
+        <option value="rating">Rating</option>
+        <option value="review">Reviews</option>
+      </select>
+
+      <input
+        type="text"
+        id="tac-code-input"
+        placeholder="Enter TAC or IMEI Code"
+      />
+      <button id="fetch-data">Search</button>
+
+      <div id="error-message" style="color: red; text-align: center"></div>
+      <!-- Placeholder for error messages -->
+      <span id="search-product-name"></span>
+      <div id="record-count" style="text-align: center; margin-top: 20px"></div>
+    </div>
+
+    <div id="products"></div>
+
+    <script>
+      let allProducts = []; // Global variable to store all fetched products
+      let currentFilter = "All"; // Global variable to keep track of the current filter
+
+      function sortProducts(sortBy) {
+        allProducts.sort((a, b) => {
+          let valueA = parseFloat(a[sortBy]);
+          let valueB = parseFloat(b[sortBy]);
+          let isValueANull = valueA === null;
+          let isValueBNull = valueB === null;
+      
+          if (isValueANull && !isValueBNull) return 1; // A is null and B is not, A goes down
+          if (!isValueANull && isValueBNull) return -1; // B is null and A is not, B goes down
+          if (isValueANull && isValueBNull) return 0; // Both are null, keep original order
+
+          // Sort price in ascending order
+          if (sortBy === "price") {
+            return valueA - valueB;
+          }
+          // Sort rating and reviews in descending order
+          else if (sortBy === "rating" || sortBy === "review") {
+            return valueB - valueA;
+          }
+        });
+      }
+
+      function displayProducts(products) {
+        const productsContainer = document.getElementById("products");
+        const recordCountElement = document.getElementById("record-count");
+        productsContainer.innerHTML = ""; // Clear current products
+
+        // Apply the current filter before displaying products
+        const filteredProducts =
+          currentFilter === "All"
+            ? products
+            : products.filter((product) => product.source === currentFilter);
+
+        // Update record count display
+        recordCountElement.textContent = `Total Products Found: ${filteredProducts.length}`;
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>Reviews</th>
+            <th>Source</th>
+            <th>Link</th>
+            <th>Image</th>
+          </tr>
+        `;
+
+        filteredProducts.forEach((product) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${product.title}</td>
+            <td>$${product.price}</td>
+            <td>${product.rating}</td>
+            <td>${product.review}</td>
+            <td>${product.source}</td>
+            <td><a href="${product.url}" target="_blank">View</a></td>
+            <td><img src="${product.image}" alt="${product.title}" style="width:100px; height:auto;"></td>
+          `;
+          table.appendChild(row);
+        });
+
+        // Append the table to the products container
+        productsContainer.appendChild(table);
+      }
+
+      document
+        .getElementById("filter-source")
+        .addEventListener("change", async (event) => {
+          currentFilter = event.target.value; // Update the current filter
+          const filteredProducts =
+            currentFilter === "All"
+              ? allProducts
+              : allProducts.filter(
+                  (product) => product.source === currentFilter
+                );
+          displayProducts(filteredProducts);
+        });
+
+      document
+        .getElementById("fetch-data")
+        .addEventListener("click", async () => {
+          const fetchDataButton = document.getElementById("fetch-data");
+          const tacCode = document.getElementById("tac-code-input").value;
+          const errorMessageElement = document.getElementById("error-message");
+          errorMessageElement.textContent = ""; // Clear any previous error messages
+
+          if (!tacCode) {
+            errorMessageElement.textContent =
+              "Please enter a 8-digit TAC or 15-digit IMEI code.";
+            return;
+          }
+
+          fetchDataButton.disabled = true;
+
+          try {
+            const response = await fetch("/fetch_products", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ tacCode: tacCode }),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.error || "An unknown error occurred");
+            }
+            if (data.products) {
+              allProducts = data.products;
+              displayProducts(allProducts);
+              document.getElementById(
+                "search-product-name"
+              ).textContent = `Search Results for: ${data.product_name}`;
+            }
+          } catch (error) {
+            errorMessageElement.textContent = error.message;
+          } finally {
+            fetchDataButton.disabled = false;
+          }
+        });
+
+      document
+        .getElementById("sort-select")
+        .addEventListener("change", (event) => {
+          const sortBy = event.target.value;
+          sortProducts(sortBy);
+          displayProducts(allProducts);
+        });
+    </script>
+  </body>
+</html>

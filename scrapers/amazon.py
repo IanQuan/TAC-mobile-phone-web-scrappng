@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
-
 from .base_scraper import BaseScraper
 
 class AmazonScraper(BaseScraper):

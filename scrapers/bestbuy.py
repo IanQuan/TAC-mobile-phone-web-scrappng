@@ -8,8 +8,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from .base_scraper import BaseScraper
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from webdriver_manager.chrome import ChromeDriverManager
 
-CHROMEDRIVER_PATH = './chromedriver'
 
 class BestBuyScraper(BaseScraper):
     def __init__(self):
@@ -29,8 +29,7 @@ class BestBuyScraper(BaseScraper):
         })
         # options.add_argument("--headless") 
         
-        service = Service(executable_path=CHROMEDRIVER_PATH)
-        driver = webdriver.Chrome(service=service, options=options) 
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         driver.get(search_url) # Bring the browser to the url specified above
         driver.set_window_size(1200, 900) # Set window resolution so that all elements can still load on page
 
